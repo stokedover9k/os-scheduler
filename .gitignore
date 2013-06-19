@@ -1,3 +1,9 @@
+# Compiled executable
+sched
+
+# Test data extracted from included tar-ball
+data1/*
+
 # Compiled Object files
 *.slo
 *.lo
