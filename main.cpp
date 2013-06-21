@@ -1,6 +1,9 @@
 #include "main.h"
+#include "random_generator.h"
 
 #include <iostream>
+#include <fstream>
+#include <iterator>
 #include <exception>
 #include <stdexcept>
 #include <map>
@@ -9,7 +12,7 @@
 // "-v"          -> "true"
 // "-s"          -> [scheduler_code]
 // "input_file"  -> [input file name]
-// "random_file" -> [random file name]
+// "random_file" -> [rando<std::istream_iterator<int, char, std::char_traits<char>, long> >(std::istream_iterator<int, char, std::char_traits<char>, long>, std::istream_iterator<int, m file name]
 std::map<std::string, std::string> parse_args( int argc, char *argv[] );
 
 //--------------------------------------------------------
@@ -18,9 +21,16 @@ int main(int argc, char *argv[])
 {
   using namespace std;
 
+  // parse arguments and set defaults where missing
   map<string, string> argmap( parse_args(argc, argv) );
   if( !argmap.count("-s") )
     argmap["-s"] = "FCFS";
+  if( !argmap.count("random_file") )
+    argmap["random_file"] = "data1/rfile";
+
+  ifstream inrandom(argmap["random_file"]);
+  int rnumbers;  inrandom >> rnumbers;
+  looping_random_generator *myrand = new looping_random_generator(istream_iterator<int>(inrandom), istream_iterator<int>());
 }
 
 //--------------------------------------------------------
