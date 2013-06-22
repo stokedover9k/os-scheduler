@@ -3,10 +3,15 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <algorithm>
+
+#include "random_generator.h"
 
 #ifndef PER_PROC_STATS
 #define PER_PROC_STATS (true)
 #endif
+
+extern random_generator *rgen;
 
 namespace prc
 {
@@ -46,6 +51,7 @@ namespace prc
   struct process_core : public process_state { //
   //===========================================//
     int get_pid() const;
+    int get_cpu_used() const;
     int run(int max_time);
   protected:
     virtual int __execute__(int max_time) = 0;
@@ -56,12 +62,18 @@ namespace prc
   protected: process_core(int pid);
   }; //end: process_core ----------------------//
 
-  //===== process =======================//
-  struct process : public process_core { //
-  //=====================================//
-
+  //===== stochastic_process =======================//
+  struct stochastic_process : public process_core { //
+  //================================================//
+    stochastic_process(int pid, int cpu, int cpu_burst, int io_burst);
+  protected:
+    virtual int __execute__(int max_time);
   private:
-  }; // end: process --------------------//
+    int const total_cpu_;
+    int const cpu_burst_;
+    int const io_burst_;
+    int current_cpu_burst_;
+  }; //end: process --------------------------------//
 };
 
 #endif //__PROCESS_H__

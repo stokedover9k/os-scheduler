@@ -8,6 +8,9 @@
 #include <stdexcept>
 #include <map>
 
+extern random_generator *rgen;
+random_generator *rgen = NULL;
+
 // Returns a map with following (optional) fields
 // "-v"          -> "true"
 // "-s"          -> [scheduler_code]
@@ -29,7 +32,6 @@ int main(int argc, char *argv[])
     argmap["random_file"] = "data1/rfile";
 
   // set up random generator
-  random_generator *rgen;
   {
     ifstream inrandom(argmap["random_file"]);
     int rnumbers;

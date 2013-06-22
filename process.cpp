@@ -69,10 +69,38 @@ prc::process_core::process_core(int pid)
 int prc::process_core::get_pid() const {
   return pid_; }
 
+int prc::process_core::get_cpu_used() const {
+  return cpu_used_; }
+
 int prc::process_core::run(int max_time) {
+  if( get_state() != READY )
+    return 0;
   int ran_for = __execute__(max_time);
   cpu_used_ += ran_for;
   return ran_for; }
 
-//===== process ======//
+//===== stochastic_process ======//
 
+prc::stochastic_process::stochastic_process(int pid, int cpu, int cpu_burst, int io_burst) :
+  process_core(pid),
+  total_cpu_(cpu),
+  cpu_burst_(cpu_burst),
+  io_burst_(io_burst),
+  current_cpu_burst_(0) { }
+
+int prc::stochastic_process::__execute__(int max_time) {
+  // if exhausted cpu burst -> new cpu burst
+  if( current_cpu_burst_ == 0 ) {
+    int cap = std::min(cpu_burst_, total_cpu_ - get_cpu_used());
+    current_cpu_burst_ = rgen->get_random(cap);
+  }
+
+  int run_for = std::min(max_time, current_cpu_burst_);
+  if( run_for == total_cpu_ - get_cpu_used() )
+    transition(FINISH);
+  else if( run_for == current_cpu_burst_ )
+    transition(BLOCK);
+  else
+    transition(PREEMPT);
+
+  return run_for; }
