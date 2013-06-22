@@ -1,5 +1,6 @@
 #include "main.h"
 #include "random_generator.h"
+#include "timer.h"
 
 #include <iostream>
 #include <fstream>
@@ -10,6 +11,9 @@
 
 extern random_generator *rgen;
 random_generator *rgen = NULL;
+
+extern timer *mytimer;
+timer *mytimer = new controlled_clock(0);
 
 // Returns a map with following (optional) fields
 // "-v"          -> "true"

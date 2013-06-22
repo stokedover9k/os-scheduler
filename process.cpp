@@ -1,9 +1,5 @@
 #include "process.h"
 
-int prc::get_time() { 
-  static int t = 0;
-  return t++; }
-
 void throw_invalid_transition_value(prc::state_transition t, std::string const& function_name) {
   std::ostringstream s;
   s << "Invalid state_transition value " << t
@@ -51,13 +47,13 @@ void prc::process_state::transition( state_transition t ) {
   state from = transition_from(t);
   state to   = transition_to(t);
   if( from == BLOCKED && to != BLOCKED )
-    blocked_time_ += get_time() - last_blocked_;
+    blocked_time_ += mytimer->get_time() - last_blocked_;
   if( to == BLOCKED && from != BLOCKED )
-    last_blocked_ = get_time();
+    last_blocked_ = mytimer->get_time();
   if( from == READY && to != READY )
-    ready_time_ += get_time() - last_ready_;
+    ready_time_ += mytimer->get_time() - last_ready_;
   if( to == READY && from != READY )
-    last_ready_ = get_time();
+    last_ready_ = mytimer->get_time();
   #endif
 }
 

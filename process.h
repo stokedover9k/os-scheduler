@@ -6,17 +6,17 @@
 #include <algorithm>
 
 #include "random_generator.h"
+#include "timer.h"
 
 #ifndef PER_PROC_STATS
 #define PER_PROC_STATS (true)
 #endif
 
 extern random_generator *rgen;
+extern timer *mytimer;
 
 namespace prc
 {
-  int get_time();
-
   enum state { 
     INVALID, READY, EXECUTING, BLOCKED, FINISHED };
 
