@@ -8,7 +8,7 @@
 struct random_generator {          //
 //=================================//
   virtual int get_random(int cap) = 0;
-}; // end: random_generator -------//
+}; //end: random_generator --------//
 
 
 
@@ -21,10 +21,10 @@ struct looping_random_generator        //
 
   virtual int get_random(int cap);
 
-//private:
+private:
   std::vector<int> nums;
   std::vector<int>::const_iterator current;
-}; // end: loopgin_random_generator ---//
+}; //end: loopgin_random_generator ----//
 
 
 

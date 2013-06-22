@@ -28,9 +28,16 @@ int main(int argc, char *argv[])
   if( !argmap.count("random_file") )
     argmap["random_file"] = "data1/rfile";
 
-  ifstream inrandom(argmap["random_file"]);
-  int rnumbers;  inrandom >> rnumbers;
-  looping_random_generator *myrand = new looping_random_generator(istream_iterator<int>(inrandom), istream_iterator<int>());
+  // set up random generator
+  random_generator *rgen;
+  {
+    ifstream inrandom(argmap["random_file"]);
+    int rnumbers;
+    inrandom >> rnumbers;
+    rgen = new looping_random_generator(istream_iterator<int>(inrandom), istream_iterator<int>());
+  }
+
+  
 }
 
 //--------------------------------------------------------
