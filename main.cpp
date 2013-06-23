@@ -12,8 +12,8 @@
 extern random_generator *rgen;
 random_generator *rgen = NULL;
 
-extern timer *mytimer;
-timer *mytimer = new controlled_clock(0);
+extern general_clock & timer;
+general_clock & timer( * new controlled_clock(0) );
 
 // Returns a map with following (optional) fields
 // "-v"          -> "true"
@@ -33,11 +33,13 @@ int main(int argc, char *argv[])
   if( !argmap.count("-s") )
     argmap["-s"] = "FCFS";
   if( !argmap.count("random_file") )
-    argmap["random_file"] = "data1/rfile";
+    argmap["random_file"] = "./rfile";
 
   // set up random generator
   {
     ifstream inrandom(argmap["random_file"]);
+    if( !inrandom )
+      throw std::ios_base::failure("could not open random file: " + argmap["random_file"]);
     int rnumbers;
     inrandom >> rnumbers;
     rgen = new looping_random_generator(istream_iterator<int>(inrandom), istream_iterator<int>());

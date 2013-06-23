@@ -47,13 +47,13 @@ void prc::process_state::transition( state_transition t ) {
   state from = transition_from(t);
   state to   = transition_to(t);
   if( from == BLOCKED && to != BLOCKED )
-    blocked_time_ += mytimer->get_time() - last_blocked_;
+    blocked_time_ += timer() - last_blocked_;
   if( to == BLOCKED && from != BLOCKED )
-    last_blocked_ = mytimer->get_time();
+    last_blocked_ = timer();
   if( from == READY && to != READY )
-    ready_time_ += mytimer->get_time() - last_ready_;
+    ready_time_ += timer() - last_ready_;
   if( to == READY && from != READY )
-    last_ready_ = mytimer->get_time();
+    last_ready_ = timer();
   #endif
 }
 

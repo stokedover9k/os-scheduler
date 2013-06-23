@@ -13,7 +13,7 @@
 #endif
 
 extern random_generator *rgen;
-extern timer *mytimer;
+extern general_clock & timer;
 
 namespace prc
 {
