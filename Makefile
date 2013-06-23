@@ -13,7 +13,7 @@ LDFLAGS += $(foreach library,$(LIBS),-l$(library))
 FILELOG_MAX_LVL=logDEBUG4
 
 C_SRCS             := 
-CXX_SRCS           := main.cpp process.cpp random_generator.cpp timer.cpp
+CXX_SRCS           := main.cpp process.cpp random_generator.cpp timer.cpp events_queue.cpp
 GENERATED_C_SRCS   := 
 GENERATED_CXX_SRCS := 
 

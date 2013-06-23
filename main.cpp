@@ -1,6 +1,8 @@
 #include "main.h"
 #include "random_generator.h"
 #include "timer.h"
+#include "process.h"
+#include "events_queue.h"
 
 #include <iostream>
 #include <fstream>
@@ -46,6 +48,34 @@ int main(int argc, char *argv[])
   }
 
   
+
+  typedef prc::process_core process;
+  typedef prc::stochastic_process sproc;
+
+  des::events_queue events;
+  cout << "empty queue: " << events.size() << endl;
+
+  process * p1 = new sproc( 1, 100, 10, 5 );
+  process * p2 = new sproc( 2, 50, 3, 15 );
+
+  des::event e1( 5, p1, prc::ARRIVE );
+  des::event e2( 5, p2, prc::ARRIVE );
+
+  events.push(e1);
+  events.push(e2);
+  cout << "queue size (ins): " << events.size() << endl;
+
+  des::event e = events.peek();
+  cout << "queue size (peek): " << events.size() << endl;
+  cout << "pid: " << e.get_process()->get_pid() << endl;
+
+  e = events.pop();
+  cout << "queue size (pop): " << events.size() << endl;
+  cout << "pid: " << e.get_process()->get_pid() << endl;
+
+  e = events.pop();
+  cout << "queue size (pop): " << events.size() << endl;
+  cout << "pid: " << e.get_process()->get_pid() << endl;
 }
 
 //--------------------------------------------------------
