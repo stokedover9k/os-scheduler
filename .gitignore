@@ -4,6 +4,12 @@ sched
 # Test data extracted from included tar-ball
 data1/*
 
+# Trace output
+trace.log
+
+# Test directory
+test/
+
 # Compiled Object files
 *.slo
 *.lo

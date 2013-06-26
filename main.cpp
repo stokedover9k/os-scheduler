@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "process.h"
 #include "events_queue.h"
+#include "loglib.h"
 
 #include <iostream>
 #include <fstream>
@@ -30,6 +31,8 @@ int main(int argc, char *argv[])
 {
   using namespace std;
 
+  Output2FILE::Stream() = fopen( "trace.log", "w" );
+
   // parse arguments and set defaults where missing
   map<string, string> argmap( parse_args(argc, argv) );
   if( !argmap.count("-s") )
@@ -53,7 +56,7 @@ int main(int argc, char *argv[])
   typedef prc::stochastic_process sproc;
 
   des::events_queue events;
-  cout << "empty queue: " << events.size() << endl;
+  TLOG << "empty queue: " << events.size();
 
   process * p1 = new sproc( 1, 100, 10, 5 );
   process * p2 = new sproc( 2, 50, 3, 15 );
@@ -63,19 +66,19 @@ int main(int argc, char *argv[])
 
   events.push(e1);
   events.push(e2);
-  cout << "queue size (ins): " << events.size() << endl;
+  TLOG << "queue size (ins): " << events.size();
 
   des::event e = events.peek();
-  cout << "queue size (peek): " << events.size() << endl;
-  cout << "pid: " << e.get_process()->get_pid() << endl;
+  TLOG << "queue size (peek): " << events.size();
+  TLOG << "pid: " << e.get_process()->get_pid();
 
   e = events.pop();
-  cout << "queue size (pop): " << events.size() << endl;
-  cout << "pid: " << e.get_process()->get_pid() << endl;
+  TLOG << "queue size (pop): " << events.size();
+  TLOG << "pid: " << e.get_process()->get_pid();
 
   e = events.pop();
-  cout << "queue size (pop): " << events.size() << endl;
-  cout << "pid: " << e.get_process()->get_pid() << endl;
+  TLOG << "queue size (pop): " << events.size();
+  TLOG << "pid: " << e.get_process()->get_pid();
 }
 
 //--------------------------------------------------------

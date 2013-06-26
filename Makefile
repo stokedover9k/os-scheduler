@@ -17,6 +17,8 @@ CXX_SRCS           := main.cpp process.cpp random_generator.cpp timer.cpp events
 GENERATED_C_SRCS   := 
 GENERATED_CXX_SRCS := 
 
+HDR_LIBS := loglib.h
+
 C_OBJS   := ${C_SRCS:.c=.o} ${GENERATED_C_SRCS:.c=.o}
 CXX_OBJS := ${CXX_SRCS:.cpp=.o} ${GENERATED_CXX_SRCS:.cpp=.o}
 OBJS     := ${C_OBJS} ${CXX_OBJS}
@@ -36,6 +38,9 @@ zipdevel:
 
 preptest:
 	tar -xvf testdata.tar
+
+# additional dependencies
+main.o : loglib.h
 
 define OBJECT_DEPENDS_ON_CORRESPONDING_HEADER
         $(1) : ${1:.o=.h}
