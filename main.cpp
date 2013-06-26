@@ -6,6 +6,7 @@
 #include "loglib.h"
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <iterator>
 #include <exception>
@@ -18,11 +19,12 @@ random_generator *rgen = NULL;
 extern general_clock & timer;
 general_clock & timer( * new controlled_clock(0) );
 
-// Returns a map with following (optional) fields
-// "-v"          -> "true"
-// "-s"          -> [scheduler_code]
-// "input_file"  -> [input file name]
-// "random_file" -> [rando<std::istream_iterator<int, char, std::char_traits<char>, long> >(std::istream_iterator<int, char, std::char_traits<char>, long>, std::istream_iterator<int, m file name]
+/* Returns a map with following (optional) fields
+ * "-v"          -> "true"
+ * "-s"          -> [scheduler_code]
+ * "input_file"  -> [input file name]
+ * "random_file" -> [rando<std::istream_iterator<int, char, std::char_traits<char>, long> >(std::istream_iterator<int, char, std::char_traits<char>, long>, std::istream_iterator<int, m file name]
+ */
 std::map<std::string, std::string> parse_args( int argc, char *argv[] );
 
 //--------------------------------------------------------
@@ -50,8 +52,26 @@ int main(int argc, char *argv[])
     rgen = new looping_random_generator(istream_iterator<int>(inrandom), istream_iterator<int>());
   }
 
-  
+  // read processes
+  des::events_queue events;
+  {
+    string line;
+    ifstream infile(argmap["input_file"]);
+    while( getline(infile, line) ) {
+      istringstream iss( line );
+      int arrival_time, total_cpu, cpu_burst, io_burst;
+      iss >> arrival_time >> total_cpu >> cpu_burst >> io_burst;
+      if( ! iss )
+        throw runtime_error("Error: malformed input file");
 
+      prc::stochastic_process *p = new prc::stochastic_process(events.size(), total_cpu, cpu_burst, io_burst);
+      events.push(arrival_time, p, prc::ARRIVE);
+    }
+  }
+
+  // test code
+
+  /*
   typedef prc::process_core process;
   typedef prc::stochastic_process sproc;
 
@@ -79,6 +99,7 @@ int main(int argc, char *argv[])
   e = events.pop();
   TLOG << "queue size (pop): " << events.size();
   TLOG << "pid: " << e.get_process()->get_pid();
+  */
 }
 
 //--------------------------------------------------------

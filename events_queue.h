@@ -37,9 +37,6 @@ namespace des
 
 
 
-
-
-
   //======== events_queue ========//
   struct events_queue {           //
   //==============================//
@@ -52,10 +49,7 @@ namespace des
     size_t size() const;
 
   protected:
-    typedef std::multiset<
-      event,
-      time_order
-    > container_type;
+    typedef std::multiset<event, time_order> container_type;
 
   private:
     container_type contents;
