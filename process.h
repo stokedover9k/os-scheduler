@@ -52,6 +52,7 @@ namespace prc
   //===========================================//
     int get_pid() const;
     int get_cpu_used() const;
+    virtual int estimate_cpu_time() const;
     int run(int max_time);
   protected:
     virtual int __execute__(int max_time) = 0;
@@ -66,6 +67,7 @@ namespace prc
   struct stochastic_process : public process_core { //
   //================================================//
     stochastic_process(int pid, int cpu, int cpu_burst, int io_burst);
+    virtual int estimate_cpu_time() const;
   protected:
     virtual int __execute__(int max_time);
   private:

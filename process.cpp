@@ -68,6 +68,9 @@ int prc::process_core::get_pid() const {
 int prc::process_core::get_cpu_used() const {
   return cpu_used_; }
 
+int prc::process_core::estimate_cpu_time() const {
+  return 1; }
+
 int prc::process_core::run(int max_time) {
   if( get_state() != READY )
     return 0;
@@ -83,6 +86,9 @@ prc::stochastic_process::stochastic_process(int pid, int cpu, int cpu_burst, int
   cpu_burst_(cpu_burst),
   io_burst_(io_burst),
   current_cpu_burst_(0) { }
+
+int prc::stochastic_process::estimate_cpu_time() const {
+  return total_cpu_ - get_cpu_used(); }
 
 int prc::stochastic_process::__execute__(int max_time) {
   // if exhausted cpu burst -> new cpu burst
