@@ -3,6 +3,7 @@
 
 #include <list>
 #include <utility>
+#include <climits>
 
 #include "process.h"
 
@@ -10,28 +11,40 @@ namespace sch
 {
   typedef prc::process_core process;
 
-
-  struct scheduler
-  {
+  //==== scheduler ====//
+  struct scheduler {   //
+  //===================//
     virtual void add_process( process * ) = 0;
 
     // returns a pair: (dispatched process, time in execution)
     // if no process is dispatched, pair.first is NULL
     virtual std::pair<process *, int> dispatch() = 0;
-  };
+  }; //end: scheduler -//
 
 
 
-  template <typename schedule_policy>
-  struct policy_scheduler : public scheduler
-  {
+  typedef std::list<process *> process_queue;
+
+  //============ policy_scheduler ==============//
+  template <typename schedule_policy>           //
+  struct policy_scheduler : public scheduler {  //
+  //============================================//
     policy_scheduler(schedule_policy policy);
     virtual void add_process( process * );
     virtual std::pair<process *, int> dispatch();
   private:
     schedule_policy policy;
-    std::list<process *> processes;
-  };
+    process_queue processes;
+  }; //end: policy_scheduler -------------------//
+
+
+
+  //======== FCFS_policy ==========//  first come, first serve
+  struct fcfs_policy {             //
+  //===============================//
+    void add_process(process_queue & q, process *p) const;
+    int run(process *p) const;
+  }; //end: fcfs_policy -----------//
 };
 
 //================ TEMPLATE IMPLEMENTATION ===================//
