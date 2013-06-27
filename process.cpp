@@ -90,6 +90,9 @@ prc::stochastic_process::stochastic_process(int pid, int cpu, int cpu_burst, int
 int prc::stochastic_process::estimate_cpu_time() const {
   return total_cpu_ - get_cpu_used(); }
 
+int prc::stochastic_process::io() {
+  return rgen->get_random(io_burst_); }
+
 int prc::stochastic_process::__execute__(int max_time) {
   // if exhausted cpu burst -> new cpu burst
   if( current_cpu_burst_ == 0 ) {

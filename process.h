@@ -28,9 +28,13 @@ namespace prc
     ARRIVE,     // abstract -> ready
     FINISH };   // executing -> finish
 
+
+
   // return state associated with given transition
   state transition_from( state_transition t );  // state from which process transitions
   state transition_to( state_transition t );    // state into which process transitions
+
+
 
   //====== process_state ======//
   struct process_state {       //
@@ -47,6 +51,8 @@ namespace prc
   protected: process_state(state s = INVALID);
   }; //end: process_state -----//
 
+
+
   //====== process_core =======================//
   struct process_core : public process_state { //
   //===========================================//
@@ -54,6 +60,7 @@ namespace prc
     int get_cpu_used() const;
     virtual int estimate_cpu_time() const;
     int run(int max_time);
+    virtual int io() = 0;
   protected:
     virtual int __execute__(int max_time) = 0;
   private: 
@@ -63,11 +70,14 @@ namespace prc
   protected: process_core(int pid);
   }; //end: process_core ----------------------//
 
+
+
   //===== stochastic_process =======================//
   struct stochastic_process : public process_core { //
   //================================================//
     stochastic_process(int pid, int cpu, int cpu_burst, int io_burst);
     virtual int estimate_cpu_time() const;
+    virtual int io();
   protected:
     virtual int __execute__(int max_time);
   private:

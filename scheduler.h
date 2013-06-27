@@ -60,6 +60,8 @@ void sch::policy_scheduler<schedule_policy>::add_process( process * p ) {
 
 template <typename schedule_policy>
 std::pair<sch::process *, int> sch::policy_scheduler<schedule_policy>::dispatch() {
+  if( processes.size() == 0 )
+    return std::make_pair(NULL, 0);
   process * p = processes.front();
   processes.pop_front();
   int ran_for = policy.run(p);

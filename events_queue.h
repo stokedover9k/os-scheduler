@@ -54,16 +54,6 @@ namespace des
   private:
     container_type contents;
   }; //end: events_queue ---------//
-
-
-
-  //========== event_simulation =========//
-  struct event_simulation {              //
-  //=====================================//
-    event_simulation(events_queue const& initial_events);
-    bool done() const;
-    bool run();
-  }; //endl: event_simulation -----------//
 };
 
 #endif //__EVENTS_QUEUE_H__

@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "process.h"
 #include "events_queue.h"
+#include "event_simulation.h"
 #include "loglib.h"
 
 #include <iostream>
@@ -16,8 +17,11 @@
 extern random_generator *rgen;
 random_generator *rgen = NULL;
 
+extern controlled_clock & timer_control;
+controlled_clock & timer_control( * new controlled_clock(0) );
+
 extern general_clock & timer;
-general_clock & timer( * new controlled_clock(0) );
+general_clock & timer( timer_control );
 
 /* Returns a map with following (optional) fields
  * "-v"          -> "true"
