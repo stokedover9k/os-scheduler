@@ -4,10 +4,12 @@
 #include "process.h"
 #include "events_queue.h"
 #include "scheduler.h"
+#include "loglib.h"
 
 #include <exception>
 
 extern random_generator *rgen;
+extern general_clock & timer;
 extern controlled_clock & timer_control;
 
 namespace des
@@ -16,8 +18,7 @@ namespace des
   //========== event_simulation =========//
   struct event_simulation {              //
   //=====================================//
-    event_simulation(events_queue const& initial_events);
-    void set_scheduler(sch::scheduler *);
+    event_simulation(events_queue const& initial_events, sch::scheduler *);
     bool done() const;
     bool run();
 

@@ -40,7 +40,9 @@ preptest:
 	tar -xvf testdata.tar
 
 # additional dependencies
-main.o : loglib.h
+main.o : loglib.h scheduler.h
+event_simulation.o : process.h loglib.h scheduler.h
+process.o : loglib.h
 
 define OBJECT_DEPENDS_ON_CORRESPONDING_HEADER
         $(1) : ${1:.o=.h}

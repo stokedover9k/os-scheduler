@@ -3,10 +3,12 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <ostream>
 #include <algorithm>
 
 #include "random_generator.h"
 #include "timer.h"
+#include "loglib.h"
 
 #ifndef PER_PROC_STATS
 #define PER_PROC_STATS (true)
@@ -41,6 +43,7 @@ namespace prc
   //===========================//
     state get_state() const;
     void transition( state_transition t );
+    virtual void send_to_stream(std::ostream&) const;
   private:
     state state_;
     #if PER_PROC_STATS
@@ -59,10 +62,13 @@ namespace prc
     int get_pid() const;
     int get_cpu_used() const;
     virtual int estimate_cpu_time() const;
-    int run(int max_time);
+    // returns (transition upon end of execution, execution time) pair
+    std::pair<state_transition, int> run(int max_time);
     virtual int io() = 0;
+    virtual void send_to_stream(std::ostream&) const;
   protected:
-    virtual int __execute__(int max_time) = 0;
+    // returns (transition, execution time) pair
+    virtual std::pair<state_transition, int> __execute__(int max_time) = 0;
   private: 
     int pid_;
     int cpu_used_;
@@ -79,7 +85,7 @@ namespace prc
     virtual int estimate_cpu_time() const;
     virtual int io();
   protected:
-    virtual int __execute__(int max_time);
+    virtual std::pair<state_transition, int> __execute__(int max_time);
   private:
     int const total_cpu_;
     int const cpu_burst_;
@@ -87,5 +93,7 @@ namespace prc
     int current_cpu_burst_;
   }; //end: process --------------------------------//
 };
+
+std::ostream & operator<<(std::ostream &, prc::process_state const &);
 
 #endif //__PROCESS_H__

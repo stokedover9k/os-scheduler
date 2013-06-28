@@ -1,8 +1,23 @@
 #include "process.h"
 
+char const * const transition_string(prc::state_transition t) {
+  static char const * const tstrings[] = {
+    "DISPATCH",
+    "PREEMPT",
+    "BLOCK",
+    "UNBLOCK",
+    "ARRIVE",
+    "FINISH" };
+  return tstrings[t]; }
+
+char const * const state_string(prc::state s) {
+  static char const * const sstrings[] = {
+    "INVALID", "READY", "EXECUTING", "BLOCKED", "FINISHED" };
+  return sstrings[s]; }
+
 void throw_invalid_transition_value(prc::state_transition t, std::string const& function_name) {
   std::ostringstream s;
-  s << "Invalid state_transition value " << t
+  s << "Invalid state_transition value " << transition_string(t)
     << " in function " << function_name;
   throw std::invalid_argument( s.str() ); }
 
@@ -39,6 +54,8 @@ prc::state prc::process_state::get_state() const {
   return state_; }
 
 void prc::process_state::transition( state_transition t ) {
+  TLOG << timer() << ": " << *this << " transitioning: " << transition_string(t);
+
   if( get_state() != transition_from(t) )
     throw_invalid_transition_value(t, "process_state::transition");
   state_ = transition_to(t); 
@@ -71,12 +88,12 @@ int prc::process_core::get_cpu_used() const {
 int prc::process_core::estimate_cpu_time() const {
   return 1; }
 
-int prc::process_core::run(int max_time) {
-  if( get_state() != READY )
-    return 0;
-  int ran_for = __execute__(max_time);
-  cpu_used_ += ran_for;
-  return ran_for; }
+std::pair<prc::state_transition, int> prc::process_core::run(int max_time) {
+  transition( DISPATCH );
+  auto res = __execute__(max_time);
+  cpu_used_ += res.second;
+
+  return res; }
 
 //===== stochastic_process ======//
 
@@ -93,19 +110,45 @@ int prc::stochastic_process::estimate_cpu_time() const {
 int prc::stochastic_process::io() {
   return rgen->get_random(io_burst_); }
 
-int prc::stochastic_process::__execute__(int max_time) {
+std::pair<prc::state_transition, int> prc::stochastic_process::__execute__(int max_time) {
   // if exhausted cpu burst -> new cpu burst
   if( current_cpu_burst_ == 0 ) {
-    int cap = std::min(cpu_burst_, total_cpu_ - get_cpu_used());
-    current_cpu_burst_ = rgen->get_random(cap);
+    current_cpu_burst_ = rgen->get_random( cpu_burst_ );
+    current_cpu_burst_ = std::min( current_cpu_burst_, total_cpu_ - get_cpu_used() );
+    TLOG << timer() << ": " << *this << " generated cpu burst of " << current_cpu_burst_;
   }
 
   int run_for = std::min(max_time, current_cpu_burst_);
-  if( run_for == total_cpu_ - get_cpu_used() )
-    transition(FINISH);
-  else if( run_for == current_cpu_burst_ )
-    transition(BLOCK);
-  else
-    transition(PREEMPT);
+  current_cpu_burst_ -= run_for;
 
-  return run_for; }
+  TLOG << timer() << ": " << *this << " runs for " << run_for << " (until " << timer() + run_for << ')';
+
+  state_transition t;
+  if( run_for == total_cpu_ - get_cpu_used() )
+    t = FINISH;
+  else if( 0 == current_cpu_burst_ )
+    t = BLOCK;
+  else
+    t = PREEMPT;
+
+  return std::pair<state_transition, int>(t, run_for); }
+
+//========= io =================//
+
+std::ostream & operator<<(std::ostream & os, prc::process_state const & p) {
+  os << '[';  p.send_to_stream(os);  return os << ']'; }
+
+void prc::process_state::send_to_stream(std::ostream &os) const {
+  os << "p " << state_string(get_state()); }
+
+void prc::process_core::send_to_stream(std::ostream &os) const {
+  os << 'p' << get_pid()
+     << ", " << state_string(get_state())
+     << ", ctotal=" << estimate_cpu_time()
+     << ", cused=" << get_cpu_used(); }
+
+std::ostream & operator<<(std::ostream & os, prc::process_core const & p) {
+  os << "[p" << p.get_pid()
+     << state_string(p.get_state()) 
+     << ", cused=" << p.get_cpu_used() << ']';
+}

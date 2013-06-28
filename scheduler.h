@@ -16,9 +16,9 @@ namespace sch
   //===================//
     virtual void add_process( process * ) = 0;
 
-    // returns a pair: (dispatched process, time in execution)
+    // returns a pair: (dispatched process, (transition upon end of execution, time in execution))
     // if no process is dispatched, pair.first is NULL
-    virtual std::pair<process *, int> dispatch() = 0;
+    virtual std::pair<sch::process *, std::pair<prc::state_transition, int> > dispatch() = 0;
   }; //end: scheduler -//
 
 
@@ -31,7 +31,7 @@ namespace sch
   //============================================//
     policy_scheduler(schedule_policy policy);
     virtual void add_process( process * );
-    virtual std::pair<process *, int> dispatch();
+    virtual std::pair<sch::process *, std::pair<prc::state_transition, int> > dispatch();
   private:
     schedule_policy policy;
     process_queue processes;
@@ -39,11 +39,17 @@ namespace sch
 
 
 
+  // templated factory function for creating policy schedulers
+  template <typename T>
+  policy_scheduler<T> * create_policy_scheduler(T const &policy);
+
+
+
   //======== FCFS_policy ==========//  first come, first serve
   struct fcfs_policy {             //
   //===============================//
     void add_process(process_queue & q, process *p) const;
-    int run(process *p) const;
+    std::pair<prc::state_transition, int> run(process *p) const;
   }; //end: fcfs_policy -----------//
 };
 
@@ -59,13 +65,18 @@ void sch::policy_scheduler<schedule_policy>::add_process( process * p ) {
 }
 
 template <typename schedule_policy>
-std::pair<sch::process *, int> sch::policy_scheduler<schedule_policy>::dispatch() {
+std::pair<sch::process *, std::pair<prc::state_transition, int> > sch::policy_scheduler<schedule_policy>::dispatch() {
   if( processes.size() == 0 )
-    return std::make_pair(NULL, 0);
+    return std::pair<sch::process *, std::pair<prc::state_transition, int> >(NULL, std::make_pair(prc::ARRIVE, 0));
   process * p = processes.front();
   processes.pop_front();
-  int ran_for = policy.run(p);
-  return std::make_pair(p, ran_for);
+  auto res = policy.run(p);
+  return std::make_pair(p, res);
+}
+
+template <typename T>
+sch::policy_scheduler<T> * sch::create_policy_scheduler(T const &policy) {
+  return new policy_scheduler<T>(policy);
 }
 
 #endif //__SCHEDULER_H__

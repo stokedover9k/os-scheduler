@@ -5,6 +5,7 @@
 #include "events_queue.h"
 #include "event_simulation.h"
 #include "loglib.h"
+#include "scheduler.h"
 
 #include <iostream>
 #include <sstream>
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
   // parse arguments and set defaults where missing
   map<string, string> argmap( parse_args(argc, argv) );
   if( !argmap.count("-s") )
-    argmap["-s"] = "FCFS";
+    argmap["-s"] = "F";
   if( !argmap.count("random_file") )
     argmap["random_file"] = "./rfile";
 
@@ -54,6 +55,19 @@ int main(int argc, char *argv[])
     int rnumbers;
     inrandom >> rnumbers;
     rgen = new looping_random_generator(istream_iterator<int>(inrandom), istream_iterator<int>());
+  }
+
+  // create scheduler
+  sch::scheduler * sched;
+  {
+    switch( argmap["-s"][0] )
+    {
+      case 'F':  sched = sch::create_policy_scheduler(sch::fcfs_policy());  break;
+      case 'L':
+      case 'S':
+      case 'R':
+      default: throw runtime_error("Error: argument indicates unknown scheduler type");
+    }
   }
 
   // read processes
@@ -71,6 +85,13 @@ int main(int argc, char *argv[])
       prc::stochastic_process *p = new prc::stochastic_process(events.size(), total_cpu, cpu_burst, io_burst);
       events.push(arrival_time, p, prc::ARRIVE);
     }
+  }
+
+  // create discrete simulator
+  des::event_simulation simulator(events, sched);
+  while( simulator.run() )
+  {
+    TLOG;
   }
 
   // test code
