@@ -98,7 +98,7 @@ void sch::policy_scheduler<schedule_policy>::add_process( process * p ) {
 template <typename schedule_policy>
 std::pair<sch::process *, std::pair<prc::state_transition, int> > sch::policy_scheduler<schedule_policy>::dispatch() {
   if( processes.size() == 0 )
-    return std::pair<sch::process *, std::pair<prc::state_transition, int> >(NULL, std::make_pair(prc::ARRIVE, 0));
+    return std::pair<sch::process *, std::pair<prc::state_transition, int> >((sch::process *)NULL, std::make_pair(prc::ARRIVE, 0));
   process * p = processes.front();
   processes.pop_front();
   auto res = policy.run(p);

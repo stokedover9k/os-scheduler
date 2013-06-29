@@ -34,7 +34,10 @@ clean:
 	rm -fv ${OBJS} ${EXECUTABLE}
 
 zipdevel:
-	zip sched.devel.zip $(CXX_SRCS) *.h
+	zip sched.devel.zip *.cpp *.h testdata.tar runit.sh Makefile README.md
+
+zip
+	zip *.cpp *.h Makefile README.md
 
 preptest:
 	tar -xvf testdata.tar
