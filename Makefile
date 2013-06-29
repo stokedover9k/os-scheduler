@@ -36,7 +36,7 @@ clean:
 zipdevel:
 	zip sched.devel.zip *.cpp *.h testdata.tar runit.sh Makefile README.md
 
-zip
+zip:
 	zip *.cpp *.h Makefile README.md
 
 preptest:
