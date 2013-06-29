@@ -99,45 +99,56 @@ int main(int argc, char *argv[])
   }
 
   // statistics and summary
-  int average_wait = 0;
-  int last_finish = 0;
-  int total_cpu = 0;
-  int average_turnaround = 0;
-  for (auto i = simulator.get_processes().begin(); 
-    i != simulator.get_processes().end();
-    ++i)
   {
-    auto proc = *i;
+    switch( argmap["-s"][0] )
+    {
+      case 'F':  cout << "FCFS" << endl;  break;
+      case 'L':  cout << "LCFS" << endl;  break;
+      case 'S':  cout << "SJF"  << endl;  break;
+      case 'R':  cout << "RR "  << endl;  break;
+    }
 
-    int finish = simulator.get_finish_times().find(proc)->second;
-    last_finish = std::max(last_finish, finish);
-    average_wait += proc->get_ready_time();
-    total_cpu += proc->get_cpu_used();
-    int turnaround = finish - simulator.get_arrival_times().find(proc)->second;
-    average_turnaround += turnaround;
+    int average_wait = 0;
+    int last_finish = 0;
+    int total_cpu = 0;
+    int average_turnaround = 0;
 
-    cout << proc->get_pid() << ": "
-         << simulator.get_arrival_times().find(proc)->second << ' '
-         << proc->get_cpu_used() << ' '
-         << cpu_bursts[proc] << ' '
-         << io_bursts[proc]
-         << " | "
-         << finish << ' '
-         << turnaround << ' '
-         << proc->get_blocked_time() << ' '
-         << proc->get_ready_time()
+    for (auto i = simulator.get_processes().begin(); 
+      i != simulator.get_processes().end(); ++i)
+    {
+      auto proc = *i;
+
+      int finish = simulator.get_finish_times().find(proc)->second;
+      last_finish = std::max(last_finish, finish);
+      average_wait += proc->get_ready_time();
+      total_cpu += proc->get_cpu_used();
+      int turnaround = finish - simulator.get_arrival_times().find(proc)->second;
+      average_turnaround += turnaround;
+
+      cout << std::setw(4) << std::setfill('0') << proc->get_pid() << ": "
+           << simulator.get_arrival_times().find(proc)->second << ' '
+           << proc->get_cpu_used() << ' '
+           << cpu_bursts[proc] << ' '
+           << io_bursts[proc]
+           << " | "
+           << finish << ' '
+           << turnaround << ' '
+           << proc->get_blocked_time() << ' '
+           << proc->get_ready_time()
+           << endl;
+    }
+
+    int num = simulator.get_processes().size();
+    cout << "SUM:   "
+         << std::fixed
+         << last_finish << ' '
+         << std::setprecision(2) << 100.0 * simulator.get_total_cpu_time() / last_finish << ' '
+         << std::setprecision(2) << 100.0 * simulator.get_total_io_time() / last_finish << ' '
+         << std::setprecision(2) << (float) average_turnaround / num << ' '
+         << std::setprecision(2) << (float) average_wait / num << ' '
+         << std::setprecision(3) << 100.0 * num / last_finish
          << endl;
   }
-  int num = simulator.get_processes().size();
-  cout << "SUM:   "
-       << last_finish << ' '
-       << 100.0 * simulator.get_total_cpu_time() / last_finish << ' '
-       << 100.0 * simulator.get_total_io_time() / last_finish << ' '
-       << (float) average_turnaround / num << ' '
-       << (float) average_wait / num << ' '
-       << 100.0 * num / last_finish
-       << endl;
-
 }
 
 //--------------------------------------------------------
