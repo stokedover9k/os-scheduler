@@ -51,6 +51,37 @@ namespace sch
     void add_process(process_queue & q, process *p) const;
     std::pair<prc::state_transition, int> run(process *p) const;
   }; //end: fcfs_policy -----------//
+
+
+
+  //======== LCFS_policy ==========//  last come, first serve
+  struct lcfs_policy               //
+    : public fcfs_policy {         //
+  //===============================//
+    void add_process(process_queue & q, process *p) const;
+  }; //end: lcfs_policy -----------//
+
+
+
+  //======== RR_policy ============//  round robin
+  struct rr_policy                 //
+    : public fcfs_policy {         //
+  //===============================//
+    rr_policy(int quantum);
+    std::pair<prc::state_transition, int> run(process *p) const;
+  private:
+    int quantum;
+  }; //end: rr_policy -------------//
+
+
+
+  //======== SJF_policy ===========//
+  struct sjf_policy                //
+    : public fcfs_policy {         //
+  //===============================//
+    void add_process(process_queue & q, process *p) const;
+  }; //end: sjf_policy ------------//
+
 };
 
 //================ TEMPLATE IMPLEMENTATION ===================//

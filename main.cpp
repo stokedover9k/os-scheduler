@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
     switch( argmap["-s"][0] )
     {
       case 'F':  sched = sch::create_policy_scheduler(sch::fcfs_policy());  break;
-      case 'L':
-      case 'S':
-      case 'R':
+      case 'L':  sched = sch::create_policy_scheduler(sch::lcfs_policy());  break;
+      case 'S':  sched = sch::create_policy_scheduler(sch::sjf_policy());   break;
+      case 'R':  sched = sch::create_policy_scheduler(sch::rr_policy(atoi(argmap["-s"].substr(1).c_str())));  break;
       default: throw runtime_error("Error: argument indicates unknown scheduler type");
     }
   }
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
       case 'F':  cout << "FCFS" << endl;  break;
       case 'L':  cout << "LCFS" << endl;  break;
       case 'S':  cout << "SJF"  << endl;  break;
-      case 'R':  cout << "RR "  << endl;  break;
+      case 'R':  cout << "RR "  << argmap["-s"].substr(1) << endl;  break;
     }
 
     int average_wait = 0;
@@ -125,21 +125,21 @@ int main(int argc, char *argv[])
       int turnaround = finish - simulator.get_arrival_times().find(proc)->second;
       average_turnaround += turnaround;
 
-      cout << std::setw(4) << std::setfill('0') << proc->get_pid() << ": "
-           << simulator.get_arrival_times().find(proc)->second << ' '
-           << proc->get_cpu_used() << ' '
-           << cpu_bursts[proc] << ' '
-           << io_bursts[proc]
+      cout << std::setw(4) << std::setfill('0') << proc->get_pid() << ": " << std::setfill(' ')
+           << std::setw(4) << simulator.get_arrival_times().find(proc)->second << ' '
+           << std::setw(4) << proc->get_cpu_used() << ' '
+           << std::setw(4) << cpu_bursts[proc] << ' '
+           << std::setw(4) << io_bursts[proc]
            << " | "
-           << finish << ' '
-           << turnaround << ' '
-           << proc->get_blocked_time() << ' '
-           << proc->get_ready_time()
+           << std::setw(4) << finish << ' '
+           << std::setw(4) << turnaround << ' '
+           << std::setw(4) << proc->get_blocked_time() << ' '
+           << std::setw(4) << proc->get_ready_time()
            << endl;
     }
 
     int num = simulator.get_processes().size();
-    cout << "SUM:   "
+    cout << "SUM: "
          << std::fixed
          << last_finish << ' '
          << std::setprecision(2) << 100.0 * simulator.get_total_cpu_time() / last_finish << ' '
