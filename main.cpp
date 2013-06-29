@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 #include <fstream>
 #include <iterator>
 #include <exception>
@@ -72,6 +73,7 @@ int main(int argc, char *argv[])
 
   // read processes
   des::events_queue events;
+  std::map<prc::process_core *, int> cpu_bursts, io_bursts;
   {
     string line;
     ifstream infile(argmap["input_file"]);
@@ -83,6 +85,8 @@ int main(int argc, char *argv[])
         throw runtime_error("Error: malformed input file");
 
       prc::stochastic_process *p = new prc::stochastic_process(events.size(), total_cpu, cpu_burst, io_burst);
+      cpu_bursts[p] = cpu_burst;
+      io_bursts[p] = io_burst;
       events.push(arrival_time, p, prc::ARRIVE);
     }
   }
@@ -91,40 +95,49 @@ int main(int argc, char *argv[])
   des::event_simulation simulator(events, sched);
   while( simulator.run() )
   {
-    TLOG;
+    TLOG;  // inserts a line into log
   }
 
-  // test code
+  // statistics and summary
+  int average_wait = 0;
+  int last_finish = 0;
+  int total_cpu = 0;
+  int average_turnaround = 0;
+  for (auto i = simulator.get_processes().begin(); 
+    i != simulator.get_processes().end();
+    ++i)
+  {
+    auto proc = *i;
 
-  /*
-  typedef prc::process_core process;
-  typedef prc::stochastic_process sproc;
+    int finish = simulator.get_finish_times().find(proc)->second;
+    last_finish = std::max(last_finish, finish);
+    average_wait += proc->get_ready_time();
+    total_cpu += proc->get_cpu_used();
+    int turnaround = finish - simulator.get_arrival_times().find(proc)->second;
+    average_turnaround += turnaround;
 
-  des::events_queue events;
-  TLOG << "empty queue: " << events.size();
+    cout << proc->get_pid() << ": "
+         << simulator.get_arrival_times().find(proc)->second << ' '
+         << proc->get_cpu_used() << ' '
+         << cpu_bursts[proc] << ' '
+         << io_bursts[proc]
+         << " | "
+         << finish << ' '
+         << turnaround << ' '
+         << proc->get_blocked_time() << ' '
+         << proc->get_ready_time()
+         << endl;
+  }
+  int num = simulator.get_processes().size();
+  cout << "SUM:   "
+       << last_finish << ' '
+       << 100.0 * simulator.get_total_cpu_time() / last_finish << ' '
+       << 100.0 * simulator.get_total_io_time() / last_finish << ' '
+       << (float) average_turnaround / num << ' '
+       << (float) average_wait / num << ' '
+       << 100.0 * num / last_finish
+       << endl;
 
-  process * p1 = new sproc( 1, 100, 10, 5 );
-  process * p2 = new sproc( 2, 50, 3, 15 );
-
-  des::event e1( 5, p1, prc::ARRIVE );
-  des::event e2( 5, p2, prc::ARRIVE );
-
-  events.push(e1);
-  events.push(e2);
-  TLOG << "queue size (ins): " << events.size();
-
-  des::event e = events.peek();
-  TLOG << "queue size (peek): " << events.size();
-  TLOG << "pid: " << e.get_process()->get_pid();
-
-  e = events.pop();
-  TLOG << "queue size (pop): " << events.size();
-  TLOG << "pid: " << e.get_process()->get_pid();
-
-  e = events.pop();
-  TLOG << "queue size (pop): " << events.size();
-  TLOG << "pid: " << e.get_process()->get_pid();
-  */
 }
 
 //--------------------------------------------------------

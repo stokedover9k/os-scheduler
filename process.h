@@ -44,6 +44,10 @@ namespace prc
     state get_state() const;
     void transition( state_transition t );
     virtual void send_to_stream(std::ostream&) const;
+    #if PER_PROC_STATS
+    int get_blocked_time() const;
+    int get_ready_time() const;
+    #endif
   private:
     state state_;
     #if PER_PROC_STATS

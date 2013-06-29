@@ -74,6 +74,16 @@ void prc::process_state::transition( state_transition t ) {
   #endif
 }
 
+#if PER_PROC_STATS
+
+int prc::process_state::get_blocked_time() const {
+  return blocked_time_; }
+
+int prc::process_state::get_ready_time() const {
+  return ready_time_; }
+
+#endif
+
 //===== process_core =====//
 
 prc::process_core::process_core(int pid)
